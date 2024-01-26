@@ -56,14 +56,14 @@ public class ListingsRepository {
 
 		MatchOperation matchListings = Aggregation.match(Criteria
 			.where("address.suburb").regex(suburb, "i")
-			.and("accommodates").is(accommodatesGuests)
-			.and("min_nights").gte(minNights)
+			.and("accommodates").gte(accommodatesGuests)
+			.and("min_nights").lte(minNights)
 			.and("price").lte(maxPrice)
 			);
 
 		ProjectionOperation projectListingFields = Aggregation.project("_id", "name", "accommodates", "price");
 
-		SortOperation sortAccordingToPrice = Aggregation.sort(Sort.Direction.ASC, "price");
+		SortOperation sortAccordingToPrice = Aggregation.sort(Sort.Direction.DESC, "price");
 
 		Aggregation pipeline = Aggregation.newAggregation(matchListings, projectListingFields, sortAccordingToPrice);
 
