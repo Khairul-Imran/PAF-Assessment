@@ -35,10 +35,11 @@ db.listings.aggregate([
 ])
 
 Task 2.4 (Removing the reviews attribute from listings)
-db.listings.update({},
-{
-    $unset : {reviews:""}
-})
+db.listings.updateMany(
+{},
+{ $unset : {reviews: 1}}
+)
+
 
 Task 2.5 (Exporting reviews to csv)
 mongoexport --collection=reviews --db=bedandbreakfast --fields=date,listing_id,reviewer_name,comments  --out=reviews.csv
