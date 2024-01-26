@@ -2,11 +2,12 @@ Write your Task 2 answers in this file
 
 Commands:
 
+Task 2.1:
 Local Import:
 mongoimport --db=bedandbreakfast -c listings_and_reviews --type=json --file=listings.json
 
-Railway Import:
-
+Railway Import (did the long way):
+mongoimport --uri="mongodb://mongo:5beEc4DfdD-Bcdc21E1DE52ad5F1gF22@monorail.proxy.rlwy.net:12820/bedandbreakfast?authSource=admin" --drop --db=bedandbreakfast -c listings_and_reviews --type=json --file=/Users/khairulimran/VTTP/PAF/PAF-Assessment/paf_assessment_template/bedandbreakfastapp/data/listings.json
 
 
 Task 2.2 (Creating Listings Collection)

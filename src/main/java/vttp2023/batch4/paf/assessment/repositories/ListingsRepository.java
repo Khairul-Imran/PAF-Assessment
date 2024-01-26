@@ -30,7 +30,9 @@ public class ListingsRepository {
 	private MongoTemplate template;
 
 	/*
-	To insert after fixing small issue.
+	db.listings.distinct(
+    	"address.suburb"
+	)
 	 */
 	public List<String> getSuburbs(String country) {
 		return template.findDistinct(new Query(), "address.suburb", "listings", String.class);
