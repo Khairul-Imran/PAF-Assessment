@@ -15,4 +15,32 @@ db.listings_and_reviews.aggregate([
     {$out: 'listings'}
 ])
 
-Task 2.3 
+Task 2.3 (Creating Reviews Collection from Australian Listings - after cleaning)
+db.listings.aggregate([
+    {$unwind : "$reviews"},
+    {
+        $project : {
+            _id : 0,
+            "reviews._id": 1, 
+            "reviews.date" : 1,
+            "reviews.listing_id" : 1,
+            "reviews.reviewer_name" : { $replaceAll: {input: "$reviews.reviewer_name", find: ",", replacement: "" }},
+            "reviews.comments" : { $replaceAll: {input: "$reviews.comments", find: "\n", replacement: "" }},
+            "reviews.comments" : { $replaceAll: {input: "$reviews.comments", find: "\r", replacement: "" }},        
+        }
+    },
+    {
+        $out: "reviews"
+    }
+])
+
+Task 2.4 (Removing the reviews attribute from listings)
+db.listings.update({},
+{
+    $unset : {reviews:""}
+})
+
+Task 2.5 (Exporting reviews to csv)
+mongoexport --collection=reviews --db=bedandbreakfast --fields=date,listing_id,reviewer_name,comments  --out=reviews.csv
+
+

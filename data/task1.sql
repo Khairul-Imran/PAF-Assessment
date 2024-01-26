@@ -21,7 +21,7 @@ create table bookings (
 );
 
 create table reviews (
-    id int not null,
+    id int auto_increment not null,
     date timestamp not null,
     listing_id varchar(20) not null,
     reviewer_name varchar(64) not null,
@@ -30,10 +30,6 @@ create table reviews (
     primary key (id)
 );
 
--- Batch insert for users.
-LOAD DATA INFILE '/Users/khairulimran/VTTP/PAF/PAF-Assessment/paf_assessment_template/bedandbreakfastapp/data/users.csv'
-INTO TABLE users 
-FIELDS TERMINATED BY ',' 
--- ENCLOSED BY '"'
--- LINES TERMINATED BY '\n'
--- IGNORE 1 ROWS
+-- Importing users from csv.
+insert into users(email, name)
+values ("fred@gmail.com", "Fred Flintstone"),("barney@gmail.com", "Barney Rubble"),("fry@planetexpress.com", "Philip J Fry"),("hlmer@gmail.com", "Homer Simpson");
