@@ -1,11 +1,18 @@
 package vttp2023.batch4.paf.assessment.repositories;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.MatchOperation;
+import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
+import org.springframework.data.mongodb.core.aggregation.SortOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
@@ -23,26 +30,65 @@ public class ListingsRepository {
 	private MongoTemplate template;
 
 	/*
-	 * Write the native MongoDB query that you will be using for this method
-	 * inside this comment block
-	 * eg. db.bffs.find({ name: 'fred }) 
-	 *
-	 *
+	To insert after fixing small issue.
 	 */
 	public List<String> getSuburbs(String country) {
-		return null;
+		return template.findDistinct(new Query(), "address.suburb", "listings", String.class);
 	}
 
 	/*
-	 * Write the native MongoDB query that you will be using for this method
-	 * inside this comment block
-	 * eg. db.bffs.find({ name: 'fred }) 
-	 *
-	 *
+	db.listings.aggregate([
+    { $match : {
+        "address.suburb" : { $regex : "bondi beach", $options : "i" },
+        accommodates : { $gte : 2 },
+        min_nights : { $gte : 5 },
+        price : { $lte : 500 }
+    }},
+    {
+        $project : { _id: 1, name : 1, accommodates : 1, price: 1 }
+    },
+    {
+        $sort : { price: -1 }
+    }
+	])
 	 */
-	public List<AccommodationSummary> findListings(String suburb, int persons, int duration, float priceRange) {
-		return null;
+	public List<AccommodationSummary> findListings(String suburb, int accommodatesGuests, int minNights, float maxPrice) {
+
+		MatchOperation matchListings = Aggregation.match(Criteria
+			.where("address.suburb").regex(suburb, "i")
+			.and("accommodates").is(accommodatesGuests)
+			.and("min_nights").gte(minNights)
+			.and("price").lte(maxPrice)
+			);
+
+		ProjectionOperation projectListingFields = Aggregation.project("_id", "name", "accommodates", "price");
+
+		SortOperation sortAccordingToPrice = Aggregation.sort(Sort.Direction.ASC, "price");
+
+		Aggregation pipeline = Aggregation.newAggregation(matchListings, projectListingFields, sortAccordingToPrice);
+
+		AggregationResults<Document> results = template.aggregate(pipeline, "listings", Document.class);
+
+		List<AccommodationSummary> listOfAccommodations = new LinkedList<>();
+		
+		for (Document document: results) {
+			AccommodationSummary accommodationSummary = new AccommodationSummary();
+            String _id = document.getString("_id");
+            String name = document.getString("name");
+			int accommodates = document.getInteger("accommodates");
+			float price = document.get("price", Number.class).floatValue();
+
+			accommodationSummary.setId(_id);
+			accommodationSummary.setName(name);
+			accommodationSummary.setAccomodates(accommodates);
+			accommodationSummary.setPrice(price);
+
+            listOfAccommodations.add(accommodationSummary);
+         }
+
+		 return listOfAccommodations;
 	}
+
 
 	// IMPORTANT: DO NOT MODIFY THIS METHOD UNLESS REQUESTED TO DO SO
 	// If this method is changed, any assessment task relying on this method will

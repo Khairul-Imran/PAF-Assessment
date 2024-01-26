@@ -1,0 +1,18 @@
+Write your Task 2 answers in this file
+
+Commands:
+
+Local Import:
+mongoimport --db=bedandbreakfast -c listings_and_reviews --type=json --file=listings.json
+
+Railway Import:
+
+
+
+Task 2.2 (Creating Listings Collection)
+db.listings_and_reviews.aggregate([
+    {$match: { "address.country" : { $regex : "australia", $options : "i" } }},
+    {$out: 'listings'}
+])
+
+Task 2.3 
